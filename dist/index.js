@@ -27,30 +27,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-let users = require('../MOCK_DATA.json');
 const dotenv = __importStar(require("dotenv"));
+const bodyParser = require('body-parser');
+let users = require('../MOCK_DATA.json');
 const port = process.env.PORT || 3000;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
 app.get('/', (req, res) => {
     res.send('Hello from my API!');
 });
-// "id": 1,
-// "first_name": "Edeline",
-// "last_name": "Buckwell",
-// "email": "ebuckwell0@globo.com",
-// "gender": "Female",
-// "ip_address": "14.9.55.68"
 // CREATE
 app.post('/users', (req, res) => {
     const newUser = {
+        id: req.body.id,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         gender: req.body.gender,
         ip_address: req.body.ip_address,
-        id: req.body.id
     };
     users.push(newUser);
     res.json(newUser);
@@ -61,10 +58,14 @@ app.get('/users', (req, res) => {
 });
 // UPDATE
 app.put('/users', (req, res) => {
-    const { id, name } = req.body;
+    const { id, first_name, last_name, email, gender, ip_address } = req.body;
     users = users.map((user) => {
         if (user.id === id) {
-            user.name = name;
+            user.first_name = first_name;
+            user.last_name = last_name;
+            user.email = email;
+            user.gender = gender;
+            user.ip_address = ip_address;
         }
         return user;
     });
@@ -76,10 +77,6 @@ app.delete('/users', (req, res) => {
     users = users.filter((user) => user.id !== id);
     res.json(users);
 });
-// // READ
-// app.get('/users', (_, res) => {
-// 	res.json(users);
-// });
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
 });

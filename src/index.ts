@@ -1,11 +1,17 @@
 import express from 'express';
-let users = require('../MOCK_DATA.json');
 import * as dotenv from 'dotenv';
+
+const bodyParser = require('body-parser');
+let users = require('../MOCK_DATA.json');
 
 
 const port = process.env.PORT || 3000;
 const app = express();
+
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 dotenv.config();
 
@@ -15,23 +21,16 @@ app.get('/', (req: any, res: { send: (arg0: string) => void; }) => {
 	res.send('Hello from my API!');
 });
 
-// "id": 1,
-// "first_name": "Edeline",
-// "last_name": "Buckwell",
-// "email": "ebuckwell0@globo.com",
-// "gender": "Female",
-// "ip_address": "14.9.55.68"
-
 
   // CREATE
 app.post('/users', (req, res) => {
 	const newUser = {
+		id: req.body.id,
 		first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    email: req.body.email,
-    gender: req.body.gender,
-    ip_address: req.body.ip_address,
-		id: req.body.id
+    	last_name: req.body.last_name,
+    	email: req.body.email,
+    	gender: req.body.gender,
+    	ip_address: req.body.ip_address,
 	};
 	users.push(newUser);
 	res.json(newUser);
@@ -45,10 +44,14 @@ app.get('/users', (req: any, res: { json: (arg0: any) => void; }) => {
 
 // UPDATE
 app.put('/users', (req, res) => {
-	const { id, name } = req.body;
-	users = users.map((user: { id: any; name: any; }) => {
+	const { id, first_name, last_name, email, gender, ip_address  } = req.body;
+	users = users.map((user: { id: any; first_name: string; last_name: string; email: string; gender: string; ip_address: any; }) => {
 		if (user.id === id) {
-			user.name = name;
+			user.first_name = first_name;
+			user.last_name = last_name;
+			user.email = email;
+			user.gender = gender;
+			user.ip_address = ip_address;
 		}
 		return user;
 	});
@@ -61,11 +64,6 @@ app.delete('/users', (req, res) => {
 	users = users.filter((user: { id: any; }) => user.id !== id);
 	res.json(users);
 });
-
-// // READ
-// app.get('/users', (_, res) => {
-// 	res.json(users);
-// });
 
 
 app.listen(port, () => {
