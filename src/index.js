@@ -1,9 +1,10 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+const mongoose = require("mongoose")
+const userRoute = require("./routes/user")
 
 const bodyParser = require('body-parser');
 let users = require('../MOCK_DATA.json');
-
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -15,9 +16,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 dotenv.config();
 
+mongoose
+	.connect(process.env.MONGO_URL)
+	.then(() => console.log("DB Connected successfuly"))
+	.catch((error) => {
+		console.log(error);
+	});
+
+app.use("/api/user", userRoute);
 
 
-app.get('/', (req: any, res: { send: (arg0: string) => void; }) => {
+
+app.get('/', (req, res) => {
 	res.send('Hello from my API!');
 });
 
@@ -38,14 +48,14 @@ app.post('/users', (req, res) => {
 
 // READ
 
-app.get('/users', (req: any, res: { json: (arg0: any) => void; }) => {
+app.get('/users', (req, res) => {
   res.json(users);
 });
 
 // UPDATE
 app.put('/users', (req, res) => {
 	const { id, first_name, last_name, email, gender, ip_address  } = req.body;
-	users = users.map((user: { id: any; first_name: string; last_name: string; email: string; gender: string; ip_address: any; }) => {
+	users = users.map((user) => {
 		if (user.id === id) {
 			user.first_name = first_name;
 			user.last_name = last_name;
@@ -61,7 +71,7 @@ app.put('/users', (req, res) => {
 // DELETE
 app.delete('/users', (req, res) => {
 	const { id } = req.body;
-	users = users.filter((user: { id: any; }) => user.id !== id);
+	users = users.filter((user) => user.id !== id);
 	res.json(users);
 });
 
