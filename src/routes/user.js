@@ -1,5 +1,5 @@
 const router = require("express").Router();
 
-router.get("/user", (req, res) => {
+router.get("/usertest", (req, res) => {
     res.send("user route")
 })
